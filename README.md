@@ -1,1 +1,1 @@
-# simple_shell
+This is a sample shell
