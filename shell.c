@@ -1,6 +1,5 @@
 #include "main.h"
 
-
 void get_input_line()
 {
     int get_line;
