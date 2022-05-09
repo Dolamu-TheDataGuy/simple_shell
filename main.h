@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void display_prompt();
+void display_prompt(void);
 void display_newline();
 
 
