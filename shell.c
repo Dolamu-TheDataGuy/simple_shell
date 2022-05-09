@@ -8,11 +8,12 @@ void get_input_line()
 
     do
     {
+        // display_prompt();
         putchar('$');
         get_line = getline(&line_ptr, &len, stdin);
         printf("%s", line_ptr);
 
-    } while (get_line);
+    } while (line_ptr != EOF);
 
     free(line_ptr);
 }
