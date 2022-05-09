@@ -10,7 +10,7 @@
 
 void _prompt()
 {
-    putchar("$");
+    putchar('>');
 
 }
 
