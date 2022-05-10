@@ -5,17 +5,20 @@ char get_and_split_input()
     int get_line;
     size_t len = 0;
     char *line_ptr = NULL;
+    int length;
     
     do
     {
         display_prompt();
         get_line = getline(&line_ptr, &len, stdin);
         printf("%s\n", line_ptr);
+        int length = strlen(line_ptr);
+        printf("%i", length);
     } while (get_line != EOF);
 
     free(line_ptr);
 
-    return(line_ptr);
+    return (*line_ptr);
 }
 
 void split_string(char *line_ptr)
@@ -30,10 +33,11 @@ void split_string(char *line_ptr)
     {
         printf( " %s\n", cmd); //printing each token
         cmd = strtok(NULL, " ");
-        input
     }
 
 }
+
+
 
 int main()
 {

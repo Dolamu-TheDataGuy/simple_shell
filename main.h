@@ -6,12 +6,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-void display_prompt(void);
-void display_newline();
 
 struct input_param
 {
-    char string_inputs
+    char string_inputs;
 };
+
+void display_prompt(void);
+void display_newline();
+
+
+/**
+ * string libraries
+ */
+
+
 
 #endif
