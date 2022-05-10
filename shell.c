@@ -1,24 +1,41 @@
 #include "main.h"
 
-void get_input_line()
+char get_and_split_input()
 {
     int get_line;
     size_t len = 0;
     char *line_ptr = NULL;
-
+    
     do
     {
         display_prompt();
-        putchar('$');
         get_line = getline(&line_ptr, &len, stdin);
-        printf("%s", line_ptr);
-
+        printf("%s\n", line_ptr);
     } while (get_line != EOF);
 
     free(line_ptr);
+
+    return(line_ptr);
+}
+
+void split_string(char *line_ptr)
+{
+    char *cmd ;
+    int j = 0;
+    char input_list;
+
+    cmd = strtok(line_ptr, " ");
+
+    while( cmd != NULL )
+    {
+        printf( " %s\n", cmd); //printing each token
+        cmd = strtok(NULL, " ");
+        input
+    }
+
 }
 
 int main()
 {
-    get_input_line();
+    get_and_split_input();
 }
