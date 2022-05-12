@@ -7,7 +7,7 @@
 #include <string.h>
 
 
-struct input_param
+struct string_array
 {
     char string_inputs;
 };
