@@ -1,24 +1,26 @@
 #include "main.h"
 
-char get_and_split_input()
+char *get_and_split_input(input *user_inputs)
 {
-    int get_line;
+    register int get_line;
     size_t len = 0;
     char *line_ptr = NULL;
     int length;
+
+    user_input->args = NULL;
     
     do
     {
         display_prompt();
-        get_line = getline(&line_ptr, &len, stdin);
-        printf("%s\n", line_ptr);
+        get_line = getline(user_input->args, &len, stdin);
+        printf("%s\n", *user_input->args);
 
         
     } while (get_line != EOF);
 
-    free(line_ptr);
+    free(user_input);
 
-    return (*line_ptr);
+    return (*user_input->args);
 }
 
 void split_string(char *line_ptr)
@@ -44,17 +46,31 @@ void split_string(char *line_ptr)
 }
 
 
-
-int main()
+void linked_list_to_array(input *user_input)
 {
-    get_and_split_input();
+    char **array_list = NULL;
+    linked_list *temp = user_input->env;
+	size_t length = 0;
+    register int i = 0;
+
+    length = list_length(user_input->env);
+    array_list = malloc(sizeof(char *) * (length +1));
+
+    if (!array_list)
+    {
+        perror("Malloc failed\n");
+        exit(1);
+    };
+    while(temp)
+    {
+        array_list[i] = _strdup(temp->strings);
+        temp = temp->next;
+        i++;
+
+    }
+    array_list[i] = NULL;
+    user_input->array_list = array_list;
+
 }
 
 
-int main()
-{
-    char str = "Hello-World"
-
-    *
-
-}

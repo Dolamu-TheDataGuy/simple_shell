@@ -7,10 +7,24 @@
 #include <string.h>
 
 
-struct string_array
+typedef struct cmd_node
 {
-    char string_inputs;
-};
+    char strings;
+    struct cmd_node *next;
+} linked_list;
+
+typedef struct input{
+    linked_list *env;
+    char **array_list;
+    char **args;
+    char *buffer;
+    char *path;
+    char *fullPath;
+    char *shellName;
+    unsigned int lineCounter;
+    int errorStatus;
+    
+}input;
 
 void display_prompt(void);
 void display_newline();
