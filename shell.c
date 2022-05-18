@@ -1,76 +1,150 @@
 #include "main.h"
 
-char *get_and_split_input(input *user_inputs)
+/**
+ * shell - simple shell
+ * @build: input build
+ */
+void shell(config *build)
 {
-    register int get_line;
-    size_t len = 0;
-    char *line_ptr = NULL;
-    int length;
-
-    user_input->args = NULL;
-    
-    do
-    {
-        display_prompt();
-        get_line = getline(user_input->args, &len, stdin);
-        printf("%s\n", *user_input->args);
-
-        
-    } while (get_line != EOF);
-
-    free(user_input);
-
-    return (*user_input->args);
+	while (true)
+	{
+		checkAndGetLine(build);
+		if (splitString(build) == false)
+			continue;
+		if (findBuiltIns(build) == true)
+			continue;
+		checkPath(build);
+		forkAndExecute(build);
+	}
 }
 
-void split_string(char *line_ptr)
+/**
+ * checkAndGetLine - check stdin and retrieves next line; handles
+ * prompt display
+ * @build: input build
+ */
+void checkAndGetLine(config *build)
 {
-    char *cmd ;
-    int j = 0;
-    char input_list;
-    char *string_split;
+	register int len;
+	size_t bufferSize = 0;
+	char *ptr, *ptr2;
 
-    int length = strlen(line_ptr);
+	build->args = NULL;
+	build->envList = NULL;
+	build->lineCounter++;
+	if (isatty(STDIN_FILENO))
+		displayPrompt();
+	len = getline(&build->buffer, &bufferSize, stdin);
+	if (len == EOF)
+	{
+		freeMembers(build);
+		if (isatty(STDIN_FILENO))
+			displayNewLine();
+		if (build->errorStatus)
+			exit(build->errorStatus);
+		exit(EXIT_SUCCESS);
 
-    string_split = malloc(length * sizeof(char));
-
-    cmd = strtok(line_ptr, " ");
-
-    while( cmd != NULL )
-    {
-        printf( " %s\n", cmd); //printing each token
-        cmd = strtok(NULL, " ");
-
-    }
-
+	}
+	ptr = _strchr(build->buffer, '\n');
+	ptr2 = _strchr(build->buffer, '\t');
+	if (ptr || ptr2)
+		insertNullByte(build->buffer, len - 1);
+	stripComments(build->buffer);
 }
 
-
-void linked_list_to_array(input *user_input)
+/**
+ * stripComments - remove comments from input string
+ * @str: input string
+ * Return: length of remaining string
+ */
+void stripComments(char *str)
 {
-    char **array_list = NULL;
-    linked_list *temp = user_input->env;
-	size_t length = 0;
-    register int i = 0;
+	register int i = 0;
+	_Bool notFirst = false;
 
-    length = list_length(user_input->env);
-    array_list = malloc(sizeof(char *) * (length +1));
-
-    if (!array_list)
-    {
-        perror("Malloc failed\n");
-        exit(1);
-    };
-    while(temp)
-    {
-        array_list[i] = _strdup(temp->strings);
-        temp = temp->next;
-        i++;
-
-    }
-    array_list[i] = NULL;
-    user_input->array_list = array_list;
-
+	while (str[i])
+	{
+		if (i == 0 && str[i] == '#')
+		{
+			insertNullByte(str, i);
+			return;
+		}
+		if (notFirst)
+		{
+			if (str[i] == '#' && str[i - 1] == ' ')
+			{
+				insertNullByte(str, i);
+				return;
+			}
+		}
+		i++;
+		notFirst = true;
+	}
 }
 
+/**
+ * forkAndExecute - fork current build and execute processes
+ * @build: input build
+ */
+void forkAndExecute(config *build)
+{
+	int status;
+	pid_t f1 = fork();
 
+	convertLLtoArr(build);
+	if (f1 == -1)
+	{
+		perror("error\n");
+		freeMembers(build);
+		freeArgs(build->envList);
+		exit(1);
+	}
+	if (f1 == 0)
+	{
+		if (execve(build->fullPath, build->args, build->envList) == -1)
+		{
+			errorHandler(build);
+			freeMembers(build);
+			freeArgs(build->envList);
+			if (errno == ENOENT)
+				exit(127);
+			if (errno == EACCES)
+				exit(126);
+		}
+	} else
+	{
+		wait(&status);
+		if (WIFEXITED(status))
+			build->errorStatus = WEXITSTATUS(status);
+		freeArgsAndBuffer(build);
+		freeArgs(build->envList);
+	}
+}
+
+/**
+ * convertLLtoArr - convert linked list to array
+ * @build: input build
+ */
+void convertLLtoArr(config *build)
+{
+	register int i = 0;
+	size_t count = 0;
+	char **envList = NULL;
+	linked_l *tmp = build->env;
+
+	count = list_len(build->env);
+	envList = malloc(sizeof(char *) * (count + 1));
+	if (!envList)
+	{
+		perror("Malloc failed\n");
+		exit(1);
+	}
+	while (tmp)
+	{
+		envList[i] = _strdup(tmp->string);
+		tmp = tmp->next;
+		i++;
+	}
+	envList[i] = NULL;
+	build->envList = envList;
+}
